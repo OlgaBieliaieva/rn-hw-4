@@ -1,43 +1,89 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   Text,
   View,
   TextInput,
-  Alert,
-  TouchableWithoutFeedback,
-  Keyboard,
+  TouchableOpacity,
 } from "react-native";
+import { CameraView, Camera } from "expo-camera";
+import * as Location from "expo-location";
 import MainButton from "./MainButton";
 import CameraIcon from "./icons/CameraIcon";
 import MapPinIcon from "./icons/MapPinIcon";
 import { colors } from "../styles/global";
 
-const CreatePostForm = ({navigation}) => {
+const CreatePostForm = ({ navigation }) => {
+  const [hasPermission, setHasPermission] = useState(null);
+  const [cameraRef, setCameraRef] = useState(null);
+  const [photo, setPhoto] = useState(null);
+  const [geoLocation, setGeoLocation] = useState(null);
   const [name, setName] = useState("");
-  const [location, setLocation] = useState("");
-  const isFormValid = name && location;
+  const [locationName, setLocationName] = useState("");
+  const isFormValid = name && locationName;
 
-  function handleSubmit() {
+  useEffect(() => {
+    (async () => {
+      const cameraStatus = await Camera.requestCameraPermissionsAsync();
+      const locationStatus = await Location.requestForegroundPermissionsAsync();
+      setHasPermission(
+        cameraStatus.status === "granted" && locationStatus.status === "granted"
+      );
+    })();
+  }, []);
+
+  const takePhoto = async () => {
+    if (cameraRef) {
+      const photoData = await cameraRef.takePictureAsync();
+      console.log(photoData);
+
+      setPhoto(photoData.uri);
+    }
+  };
+
+  const handlePublish = async () => {
+    const location = await Location.getCurrentPositionAsync({});
+    console.log(location.coords);
+
+    setGeoLocation(location.coords);
+
     const post = {
+      photo,
       name,
-      location,
+      locationName,
+      geoLocation: location.coords,
     };
-    console.log(post);
 
-    Alert.alert(`Опубліковано!`);
-    setName("");
-    setLocation("");
-    navigation.navigate("Posts")
+    navigation.navigate("Posts", { post });
+  };
+
+  if (hasPermission === null) {
+    return (
+      <View>
+        <Text>Запит дозволу...</Text>
+      </View>
+    );
   }
+
+  if (hasPermission === false) {
+    return (
+      <View>
+        <Text>Доступ до камери чи локації заборонено</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.formContainer}>
       <View style={styles.imageContainer}>
-        <View style={styles.imageWrapper}>
-          <View style={styles.iconWrapper}>
+        <CameraView
+          style={styles.imageWrapper}
+          ref={(ref) => setCameraRef(ref)}
+        >
+          <TouchableOpacity style={styles.iconWrapper} onPress={takePhoto}>
             <CameraIcon />
-          </View>
-        </View>
+          </TouchableOpacity>
+        </CameraView>
         <Text style={styles.inputText}>Завантажте фото</Text>
       </View>
       <View style={styles.inputsContainer}>
@@ -50,8 +96,8 @@ const CreatePostForm = ({navigation}) => {
           style={styles.commonInput}
         />
         <TextInput
-          value={location}
-          onChangeText={setLocation}
+          value={locationName}
+          onChangeText={setLocationName}
           placeholder="Місцевість..."
           autoComplete="off"
           autoCapitalize="true"
@@ -59,7 +105,7 @@ const CreatePostForm = ({navigation}) => {
         />
         <MapPinIcon style={styles.inputIcon} />
       </View>
-      <MainButton action={handleSubmit} disabled={!isFormValid}>
+      <MainButton action={handlePublish} disabled={!isFormValid}>
         <Text
           style={isFormValid ? styles.activeBtnText : styles.inactiveBtnText}
         >

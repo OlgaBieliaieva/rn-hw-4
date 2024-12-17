@@ -2,7 +2,10 @@ import React from "react";
 import { StyleSheet, View, Text, Image } from "react-native";
 import { colors } from "../styles/global";
 
-const PostsScreen = () => {
+const PostsScreen = ({ route }) => {
+  const post = route.params?.post;
+  console.log(post);
+
   return (
     <View style={styles.container}>
       <View style={styles.userContainer}>
