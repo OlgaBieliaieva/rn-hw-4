@@ -1,6 +1,5 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
-import ProfileStackNavigator from "./ProfileStackNavigator";
 import PostsScreen from "../screens/PostsScreen";
 import CreatePostsScreen from "../screens/CreatePostsScreen";
 import ProfileScreen from "../screens/ProfileScreen";
@@ -26,7 +25,7 @@ const BottomTabNavigator = () => (
             </View>
           );
         } else if (route.name === "Profile") {
-          return <ProfileIcon stroke={colors.black}/>;
+          return <ProfileIcon stroke={colors.black} />;
         }
       },
       tabBarShowLabel: false,
@@ -75,7 +74,7 @@ const BottomTabNavigator = () => (
     />
     <Tab.Screen
       name="Profile"
-      component={ProfileStackNavigator}
+      component={ProfileScreen}
       options={{
         headerShown: false,
       }}

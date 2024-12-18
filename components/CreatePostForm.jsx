@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import { CameraView, Camera } from "expo-camera";
 import * as Location from "expo-location";
+import * as MediaLibrary from "expo-media-library";
 import MainButton from "./MainButton";
 import CameraIcon from "./icons/CameraIcon";
 import MapPinIcon from "./icons/MapPinIcon";
@@ -26,8 +27,11 @@ const CreatePostForm = ({ navigation }) => {
     (async () => {
       const cameraStatus = await Camera.requestCameraPermissionsAsync();
       const locationStatus = await Location.requestForegroundPermissionsAsync();
+      const mediaLibraryStatus = await MediaLibrary.requestPermissionsAsync();
       setHasPermission(
-        cameraStatus.status === "granted" && locationStatus.status === "granted"
+        cameraStatus.status === "granted" &&
+          locationStatus.status === "granted" &&
+          mediaLibraryStatus.status === "granted"
       );
     })();
   }, []);
@@ -35,18 +39,14 @@ const CreatePostForm = ({ navigation }) => {
   const takePhoto = async () => {
     if (cameraRef) {
       const photoData = await cameraRef.takePictureAsync();
-      console.log(photoData);
-
-      setPhoto(photoData.uri);
+      const asset = await MediaLibrary.createAssetAsync(photoData.uri);
+      setPhoto(asset.uri);
     }
   };
 
   const handlePublish = async () => {
     const location = await Location.getCurrentPositionAsync({});
-    console.log(location.coords);
-
     setGeoLocation(location.coords);
-
     const post = {
       photo,
       name,

@@ -1,10 +1,10 @@
 import React from "react";
 import { StyleSheet, View, Text, Image } from "react-native";
+import PostsList from "../components/PostsList";
 import { colors } from "../styles/global";
 
-const PostsScreen = ({ route }) => {
+const PostsScreen = ({ route, navigation }) => {
   const post = route.params?.post;
-  console.log(post);
 
   return (
     <View style={styles.container}>
@@ -17,6 +17,7 @@ const PostsScreen = ({ route }) => {
           <Text style={styles.userEmail}>user1@gmail.com</Text>
         </View>
       </View>
+      <PostsList post={post} navigation={navigation} />
     </View>
   );
 };
@@ -34,6 +35,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
+    marginBottom: 32,
   },
   avatarWrapper: {
     width: 60,

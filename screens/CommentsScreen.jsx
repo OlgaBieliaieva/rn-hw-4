@@ -7,21 +7,20 @@ import {
   TouchableOpacity,
 } from "react-native";
 import CommentsList from "../components/CommentsList";
-import BgImg from "../assets/images/bg-img.jpg";
 import ArrowUpIcon from "../components/icons/ArrowUpIcon";
 import { colors } from "../styles/global";
 
-const CommentsScreen = () => {
+const CommentsScreen = ({ route }) => {
   const [comment, setComment] = useState("");
+  const post = route.params?.post;
 
   const handleSubmit = () => {
-    console.log(comment);
     setComment("");
   };
   return (
     <View style={styles.container}>
       <View style={styles.imgWrapper}>
-        <Image source={BgImg} style={styles.img} />
+        <Image source={{ uri: post.photo }} style={styles.img} />
       </View>
       <CommentsList />
       <View style={styles.commentContainer}>
